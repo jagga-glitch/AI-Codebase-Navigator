@@ -1,0 +1,533 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI CodeBase Navigator | Master Any Codebase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#373940",
+                    "on-primary": "#002e6a",
+                    "on-primary-fixed": "#001a42",
+                    "on-secondary-fixed": "#002113",
+                    "outline": "#8c909f",
+                    "primary": "#adc6ff",
+                    "inverse-surface": "#e2e2eb",
+                    "on-background": "#e2e2eb",
+                    "on-primary-fixed-variant": "#004395",
+                    "secondary": "#4edea3",
+                    "tertiary-fixed": "#e9ddff",
+                    "on-tertiary-fixed": "#23005c",
+                    "surface-container": "#1e1f26",
+                    "primary-container": "#4d8eff",
+                    "surface-container-high": "#282a30",
+                    "on-secondary-container": "#00311f",
+                    "secondary-fixed-dim": "#4edea3",
+                    "primary-fixed": "#d8e2ff",
+                    "on-secondary": "#003824",
+                    "secondary-container": "#00a572",
+                    "error-container": "#93000a",
+                    "on-surface-variant": "#c2c6d6",
+                    "surface-container-low": "#191b22",
+                    "on-tertiary-container": "#340080",
+                    "secondary-fixed": "#6ffbbe",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-highest": "#33343b",
+                    "error": "#ffb4ab",
+                    "background": "#111319",
+                    "surface-dim": "#111319",
+                    "surface-container-lowest": "#0c0e14",
+                    "on-surface": "#e2e2eb",
+                    "on-tertiary-fixed-variant": "#5516be",
+                    "inverse-primary": "#005ac2",
+                    "tertiary": "#d0bcff",
+                    "surface": "#111319",
+                    "outline-variant": "#424754",
+                    "surface-tint": "#adc6ff",
+                    "tertiary-fixed-dim": "#d0bcff",
+                    "tertiary-container": "#a078ff",
+                    "surface-variant": "#33343b",
+                    "inverse-on-surface": "#2e3037",
+                    "on-secondary-fixed-variant": "#005236",
+                    "primary-fixed-dim": "#adc6ff",
+                    "on-primary-container": "#00285d",
+                    "on-error": "#690005"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "sidebar-width": "280px",
+                    "stack-sm": "8px",
+                    "unit": "4px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "gutter": "16px",
+                    "container-padding": "24px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "code-md": ["JetBrains Mono"],
+                    "label-caps": ["JetBrains Mono"],
+                    "code-sm": ["JetBrains Mono"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "code-md": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "code-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0F1117;
+            color: #e2e2eb;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        .code-gradient {
+            background: linear-gradient(135deg, #161B22 0%, #0F1117 100%);
+        }
+
+        .hero-mesh {
+            background-image: radial-gradient(circle at 2px 2px, #1E293B 1px, transparent 0);
+            background-size: 32px 32px;
+        }
+
+        .glow-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 0 rgba(173, 198, 255, 0);
+        }
+        .glow-button:hover {
+            box-shadow: 0 0 20px rgba(173, 198, 255, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .bento-card {
+            background: #161B22;
+            border: 1px solid #1E293B;
+            transition: border-color 0.2s ease;
+        }
+        .bento-card:hover {
+            border-color: #adc6ff;
+        }
+
+        /* Technical Line Decor */
+        .tech-line {
+            position: absolute;
+            background: #1E293B;
+        }
+    </style>
+</head>
+<body class="bg-background">
+<!-- TopNavBar Component -->
+<nav class="fixed top-0 left-0 right-0 h-16 bg-surface z-50 flex items-center justify-between px-container-padding border-b border-outline-variant">
+<div class="flex items-center gap-stack-lg">
+<a class="font-headline-md text-headline-md font-black text-on-surface tracking-tighter" href="index.html">Navigator</a>
+<div class="hidden lg:flex items-center gap-4 overflow-x-auto whitespace-nowrap max-w-[52vw]">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-lg text-body-lg" href="index.html">Overview</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="analysisAndArchitecture.html">Architecture</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="api_documentation.html">API Docs</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="chat_assistant.html">Chat Assistant</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="code_asistant.html">Code Assistant</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="file_history.html">File History</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="intelligence_dashboard.html">Dashboard</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="Interview_prep.html">Interview Prep</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="learning.html">Learning</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="repo_dashboard.html">Repo Dashboard</a>
+</div>
+</div>
+<div class="flex items-center gap-gutter">
+<div class="hidden sm:flex items-center bg-surface-container-lowest px-stack-md py-1 border border-outline-variant rounded-lg">
+<span class="material-symbols-outlined text-outline text-sm mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md font-body-md w-48 text-on-surface placeholder:text-outline" placeholder="Search documentation..." type="text">
+<span class="text-outline text-[10px] font-code-md ml-2 px-1 border border-outline-variant rounded">⌘K</span>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="text-on-surface-variant hover:text-primary transition-all p-2">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md" href="api_documentation.html">Documentation</a>
+<a class="bg-primary text-on-primary font-body-md text-body-md font-bold px-stack-md py-2 rounded-lg hover:bg-primary-fixed transition-colors" href="chat_assistant.html">Open Assistant</a>
+</div>
+</div>
+</nav>
+<main class="pt-16 min-h-screen">
+<!-- Hero Section -->
+<section class="relative min-h-[870px] flex flex-col items-center justify-center px-container-padding overflow-hidden">
+<!-- Background Elements -->
+<div class="absolute inset-0 hero-mesh opacity-30 pointer-events-none"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+<!-- Floating Decorative Icons -->
+<div class="absolute top-20 left-[15%] opacity-20 animate-pulse">
+<span class="material-symbols-outlined text-6xl text-primary">data_object</span>
+</div>
+<div class="absolute bottom-40 right-[12%] opacity-20 animate-pulse" style="animation-delay: 1s">
+<span class="material-symbols-outlined text-6xl text-secondary">terminal</span>
+</div>
+<div class="relative z-10 text-center max-w-4xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 mb-stack-lg border border-primary/30 rounded-full bg-primary/5">
+<span class="flex h-2 w-2 rounded-full bg-secondary animate-ping"></span>
+<span class="font-label-caps text-label-caps text-primary">New: v1.2 Release with Deep Dependency Mapping</span>
+</div>
+<h1 class="font-headline-lg text-[64px] leading-[1.1] mb-stack-md tracking-tight">
+                    Master Any Codebase <br>
+<span class="text-primary">in Minutes, Not Months.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-stack-lg max-w-2xl mx-auto">
+                    AI CodeBase Navigator indexes your entire repository, maps architectures, and answers complex technical questions instantly. Stop reading docs, start shipping.
+                </p>
+<!-- URL Input Field -->
+<div class="relative max-w-2xl mx-auto group">
+<div class="flex flex-col md:flex-row items-stretch gap-unit p-unit bg-surface-container border border-outline-variant rounded-xl focus-within:border-primary transition-colors shadow-2xl">
+<div class="flex-grow flex items-center px-stack-md py-3 gap-stack-md">
+<span class="material-symbols-outlined text-outline">link</span>
+<input class="bg-transparent border-none focus:ring-0 text-on-surface font-code-md text-code-md w-full placeholder:text-outline/50" placeholder="https://github.com/organization/repository" type="text">
+</div>
+<button class="glow-button bg-primary text-on-primary font-headline-sm text-headline-sm px-stack-lg py-3 rounded-lg flex items-center justify-center gap-2">
+<span class="">Start Analysis</span>
+<span class="material-symbols-outlined">bolt</span>
+</button>
+</div>
+<!-- Technical Meta info -->
+<div class="flex flex-wrap items-center justify-center gap-2 mb-4">
+  <span class="text-outline text-xs font-code-sm mr-2">Try an example:</span>
+  <button class="px-3 py-1 rounded-full bg-surface-container border border-outline-variant text-xs font-code-sm text-on-surface-variant hover:border-primary hover:text-primary transition-colors">facebook/react</button>
+  <button class="px-3 py-1 rounded-full bg-surface-container border border-outline-variant text-xs font-code-sm text-on-surface-variant hover:border-primary hover:text-primary transition-colors">vercel/next.js</button>
+  <button class="px-3 py-1 rounded-full bg-surface-container border border-outline-variant text-xs font-code-sm text-on-surface-variant hover:border-primary hover:text-primary transition-colors">expressjs/express</button>
+</div><div class="mt-stack-md flex items-center justify-center gap-stack-lg text-outline text-xs font-code-sm">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">check_circle</span>
+<span class="">Public &amp; Private Repos</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">shield</span>
+<span class="">SOC2 Compliant</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">speed</span>
+<span class="">&lt; 60s Indexing</span>
+</div>
+</div><div class="mt-stack-lg pt-stack-lg border-t border-outline-variant/30 grid grid-cols-3 gap-gutter">
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-1 text-primary mb-1">
+      <span class="material-symbols-outlined text-sm">analytics</span>
+      <span class="font-headline-sm text-headline-sm">1.2M+</span>
+    </div>
+    <div class="text-[10px] font-label-caps text-outline">REPOS ANALYZED</div>
+  </div>
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-1 text-secondary mb-1">
+      <span class="material-symbols-outlined text-sm">timer</span>
+      <span class="font-headline-sm text-headline-sm">42s</span>
+    </div>
+    <div class="text-[10px] font-label-caps text-outline">AVG ANALYSIS TIME</div>
+  </div>
+  <div class="text-center">
+    <div class="flex items-center justify-center gap-1 text-tertiary mb-1">
+      <span class="material-symbols-outlined text-sm">language</span>
+      <span class="font-headline-sm text-headline-sm">25+</span>
+    </div>
+    <div class="text-[10px] font-label-caps text-outline">LANGUAGES</div>
+  </div>
+</div>
+</div>
+</div>
+</section>
+<!-- How It Works Section -->
+<section class="py-stack-lg bg-surface-container-lowest border-y border-outline-variant">
+<div class="max-w-7xl mx-auto px-container-padding">
+<div class="text-center mb-stack-lg">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">How It Works</h2>
+<p class="text-on-surface-variant font-body-md text-body-md">Engineered for developer speed.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter relative">
+<!-- Connector Lines (Desktop only) -->
+<div class="hidden md:block absolute top-1/3 left-1/3 w-[33%] h-px bg-outline-variant"></div>
+<div class="hidden md:block absolute top-1/3 left-2/3 w-[33%] h-px bg-outline-variant"></div>
+<!-- Step 1 -->
+<div class="flex flex-col items-center text-center p-stack-md relative z-10">
+<div class="w-16 h-16 rounded-xl bg-surface-container border border-outline-variant flex items-center justify-center mb-stack-md text-primary">
+<span class="material-symbols-outlined text-3xl">input</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">1. Import</h3>
+<p class="text-on-surface-variant font-body-md text-body-md">Connect your GitHub, GitLab, or Bitbucket repository. We sync in real-time with your branches.</p>
+</div>
+<!-- Step 2 -->
+<div class="flex flex-col items-center text-center p-stack-md relative z-10">
+<div class="w-16 h-16 rounded-xl bg-surface-container border border-outline-variant flex items-center justify-center mb-stack-md text-secondary">
+<span class="material-symbols-outlined text-3xl">psychology</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">2. Analyze</h3>
+<p class="text-on-surface-variant font-body-md text-body-md">Our LLMs build a semantic index of your logic, dependencies, and architecture patterns.</p>
+</div>
+<!-- Step 3 -->
+<div class="flex flex-col items-center text-center p-stack-md relative z-10">
+<div class="w-16 h-16 rounded-xl bg-surface-container border border-outline-variant flex items-center justify-center mb-stack-md text-tertiary">
+<span class="material-symbols-outlined text-3xl">explore</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">3. Explore</h3>
+<p class="text-on-surface-variant font-body-md text-body-md">Ask questions like "Where is the auth handled?" or "Find the performance bottleneck in the API."</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Repositories Section -->
+<section class="py-stack-lg px-container-padding max-w-7xl mx-auto">
+<div class="flex items-center justify-between mb-stack-lg">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Recent Repositories</h2>
+<p class="text-on-surface-variant font-body-md text-body-md">Resume analysis from your previous sessions.</p>
+</div>
+<button class="flex items-center gap-2 text-primary font-label-caps text-label-caps hover:underline">
+<span class="">VIEW ALL REPOS</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Repo Card 1 -->
+<div class="bento-card p-stack-md rounded-xl group cursor-pointer">
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container-high rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">database</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">distributed-cache-v3</h4>
+<span class="font-code-sm text-code-sm text-outline">github.com/v-systems/core</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">open_in_new</span>
+</div>
+<div class="flex items-center gap-4 mb-4">
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-blue-400"></span>
+<span class="text-xs font-code-sm text-on-surface-variant">TypeScript</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-outline">history</span>
+<span class="text-xs font-code-sm text-on-surface-variant">2h ago</span>
+</div>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[85%]"></div>
+</div>
+<div class="flex justify-between mt-2">
+<span class="text-[10px] font-label-caps text-outline">INDEXING PROGRESS</span>
+<span class="text-[10px] font-label-caps text-primary">85% COMPLETE</span>
+</div>
+</div>
+<!-- Repo Card 2 -->
+<div class="bento-card p-stack-md rounded-xl group cursor-pointer">
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container-high rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary">api</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">cloud-gateway-proxy</h4>
+<span class="font-code-sm text-code-sm text-outline">github.com/infra-ops/main</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">open_in_new</span>
+</div>
+<div class="flex items-center gap-4 mb-4">
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-teal-400"></span>
+<span class="text-xs font-code-sm text-on-surface-variant">Go</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-outline">history</span>
+<span class="text-xs font-code-sm text-on-surface-variant">Yesterday</span>
+</div>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full w-full"></div>
+</div>
+<div class="flex justify-between mt-2">
+<span class="text-[10px] font-label-caps text-outline">INDEXING PROGRESS</span>
+<span class="text-[10px] font-label-caps text-secondary">FULLY INDEXED</span>
+</div>
+</div>
+<!-- Repo Card 3 -->
+<div class="bento-card p-stack-md rounded-xl group cursor-pointer">
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container-high rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-error">settings_ethernet</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">internal-tooling-ui</h4>
+<span class="font-code-sm text-code-sm text-outline">github.com/front-devs/internal</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">open_in_new</span>
+</div>
+<div class="flex items-center gap-4 mb-4">
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-orange-400"></span>
+<span class="text-xs font-code-sm text-on-surface-variant">Rust</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-outline">history</span>
+<span class="text-xs font-code-sm text-on-surface-variant">5 days ago</span>
+</div>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-full"></div>
+</div>
+<div class="flex justify-between mt-2">
+<span class="text-[10px] font-label-caps text-outline">INDEXING PROGRESS</span>
+<span class="text-[10px] font-label-caps text-primary">FULLY INDEXED</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Feature Spotlight (Bento Layout) -->
+<section class="py-stack-lg px-container-padding max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-12 grid-rows-2 gap-gutter h-auto md:h-[600px]">
+<div class="md:col-span-8 bento-card rounded-2xl overflow-hidden relative group">
+<div class="p-stack-lg relative z-10">
+<span class="font-label-caps text-label-caps text-primary mb-2 block">POWERFUL VISUALIZATION</span>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mb-stack-md">Map Architectural Flow</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md">Automatically generate dynamic sequence diagrams and dependency graphs. Understand how data flows from your API controllers to the database in real-time.</p>
+</div>
+<div class="absolute right-0 bottom-0 top-0 w-1/2 overflow-hidden border-l border-outline-variant bg-surface-container-lowest">
+<img class="w-full h-full object-cover opacity-60" data-alt="A sophisticated architectural flow diagram showing interconnected software nodes and data streams in a technical dark mode aesthetic, utilizing neon blue and teal highlights on a deep slate background. The image has a clean, professional UI feel with thin grid lines and minimal labels." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuUGYRBM5gD6VvGqC0XuvjPeghgzYWnwdqsZ5mKyp_TMFPxUZkz9N8rlrtQKIzLa9m-VObkRJnzV2Mj3HTMulZcwh9IxjHfbppxlVVVD8xu7C3LH-yOMKKPXA5NEzhoiXv7tLnBYqcE2Qm1jTFrW9HCj0uIYA7dj2xYTMrdtU6Hvi16GFBo8lMBi-eOADIuCYTaY6BbHeo8CiI43bORENsqtFJ201-aXjkLBKCXp7jS353uAvP-Q6P9xKBXqsWRVEamixR1vayP87z">
+</div>
+</div>
+<div class="md:col-span-4 bento-card rounded-2xl p-stack-lg flex flex-col justify-between">
+<div>
+<span class="font-label-caps text-label-caps text-secondary mb-2 block">CONTEXT AWARE</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Integrated AI Chat</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-stack-md">Chat directly with your code. Navigator understands file hierarchies, imports, and cross-file references.</p>
+</div>
+<div class="mt-stack-lg bg-surface-container-highest p-4 rounded-xl border border-outline-variant font-code-sm text-code-sm">
+<div class="flex items-center gap-2 mb-2 text-secondary">
+<span class="material-symbols-outlined text-sm">smart_toy</span>
+<span class="">AI Assistant</span>
+</div>
+<p class="text-on-surface-variant">The 'UserStore' class handles database connections in <span class="text-primary">lib/stores.ts</span>. You can find the caching logic on line 42.</p>
+</div>
+</div>
+<div class="md:col-span-4 bento-card rounded-2xl p-stack-lg relative overflow-hidden group">
+<span class="font-label-caps text-label-caps text-tertiary mb-2 block">INSIGHTS</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Security Audit</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-stack-md">Identify credential leaks, circular dependencies, and outdated packages instantly.</p>
+<div class="absolute -bottom-4 -right-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[120px]">verified_user</span>
+</div>
+</div>
+<div class="md:col-span-8 bento-card rounded-2xl p-stack-lg flex flex-col md:flex-row items-center gap-stack-lg bg-surface-container-lowest">
+<div class="flex-grow">
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-2 block">TEAM SYNC</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Shared Knowledge Base</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-stack-md">Annotate repositories and share complex architectural insights with your whole team. Onboard new developers 10x faster.</p>
+</div>
+<div class="flex -space-x-4">
+<img class="w-12 h-12 rounded-full border-2 border-surface" data-alt="A collection of professional software engineer headshots in circular frames, arranged in a clean overlapping pattern. The lighting is moody and technical, consistent with a dark mode developer environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz-cSpbnyhrmDccCaPTG8nInv5wdKrOM3Qr2b2rNijTQ_zJAF9ulTy69bwi6-VChHQwmsECpHMdjgrv8MsN5uyTXrCg3OkEODZj6Iq2LCmdXN-ixSFdbU6_n843tOVyDDSpEUrsTxjsUsfpCPvg43pLSDMrstle9ZJ7y3eakk1ADYfWfhDx3-UYqS6H01CVZuXXL30G40z16XqIYFqh7fcEOv3DHStLgyiQ1aZMwwT65kcReeNk_POo4p-L2z2bJc9Sk1FEh1LYMMO">
+<img class="w-12 h-12 rounded-full border-2 border-surface" data-alt="A collection of professional software engineer headshots in circular frames, arranged in a clean overlapping pattern. The lighting is moody and technical, consistent with a dark mode developer environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcsJAU7LOOLN6-b8HwwVxS4z4o6qFEyybf84AxqoPnTZpF223TrsvibhOCTeSFTnoxxH4NCu-7gW49yfnesJDqLe3KONr4pGUoPB-iryRfT0WZkON3sIvt-yD41mNAibzkhZ53DTQAMOW5UCiiSmya0EZOf4hSJ-_3kebk7KS7Fi3J43XwieU117OBc26mAEOE4rdZ88L1InMyw1ZwXvJ0XcZIbFoUbHZw2DtCU3aY6obripnC7np5n9MEvUIrFaN0gn5dIFnl5sS3">
+<img class="w-12 h-12 rounded-full border-2 border-surface" data-alt="A collection of professional software engineer headshots in circular frames, arranged in a clean overlapping pattern. The lighting is moody and technical, consistent with a dark mode developer environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlwlo3uqB-Z8aIXfbFkUQ1dh4dWMOFLU0XihP8FW16g1OlxyVWVXFiUcu-gBMe8x9eD44hVtNz44sB7bywlCmIUu4oC-w9e2MlVGxfDbabATTw0TddmZXfNzTwH3ekGRDmXdJtlJUP8yG-_gACL9WWZti01gWogeUJGBIVGBgMnYi6POOUpAGFonm_09kIZIo4t6gDwUEWZ0v6gsMa9Mmyh9_5D4dAGE_7idSBUPieOnIgbewWPipgkXTLXLVSe8CAmTevO8wtywZ2">
+<div class="w-12 h-12 rounded-full bg-surface-container border-2 border-surface flex items-center justify-center text-[10px] font-bold">+12</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant py-stack-lg">
+<div class="max-w-7xl mx-auto px-container-padding">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-stack-lg">
+<div class="col-span-2">
+<span class="font-headline-md text-headline-md font-black text-on-surface tracking-tighter mb-4 block">Navigator</span>
+<p class="text-on-surface-variant font-body-md text-body-md max-w-sm mb-stack-lg">The world's most advanced AI-powered codebase exploration tool. Designed by engineers, for engineers.</p>
+<div class="flex gap-stack-md">
+<a class="text-outline hover:text-primary" href="#"><span class="material-symbols-outlined">alternate_email</span></a>
+<a class="text-outline hover:text-primary" href="#"><span class="material-symbols-outlined">hub</span></a>
+<a class="text-outline hover:text-primary" href="#"><span class="material-symbols-outlined">code</span></a>
+</div>
+</div>
+<div>
+<h5 class="font-label-caps text-label-caps text-on-surface mb-stack-md">PRODUCT</h5>
+<ul class="space-y-2 text-on-surface-variant font-body-md text-body-md">
+<li class=""><a class="hover:text-primary transition-colors" href="#">Features</a></li>
+<li class=""><a class="hover:text-primary transition-colors" href="#">Enterprise</a></li>
+<li class=""><a class="hover:text-primary transition-colors" href="#">Changelog</a></li>
+<li class=""><a class="hover:text-primary transition-colors" href="#">Pricing</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-label-caps text-label-caps text-on-surface mb-stack-md">RESOURCES</h5>
+<ul class="space-y-2 text-on-surface-variant font-body-md text-body-md">
+<li class=""><a class="hover:text-primary transition-colors" href="#">Documentation</a></li>
+<li class=""><a class="hover:text-primary transition-colors" href="#">API Reference</a></li>
+<li class=""><a class="hover:text-primary transition-colors" href="#">Community</a></li>
+<li class=""><a class="hover:text-primary transition-colors" href="#">Security</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-stack-lg pt-stack-md border-t border-outline-variant flex flex-col md:flex-row justify-between items-center gap-stack-md">
+<span class="text-outline font-code-sm text-code-sm">© 2024 AI CodeBase Navigator Inc. All rights reserved.</span>
+<div class="flex gap-gutter text-outline font-code-sm text-code-sm">
+<a class="hover:text-primary" href="#">Privacy Policy</a>
+<a class="hover:text-primary" href="#">Terms of Service</a>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interaction for input field
+        const inputField = document.querySelector('input[placeholder*="github.com"]');
+        const container = inputField.closest('.group');
+
+        inputField.addEventListener('focus', () => {
+            container.classList.add('scale-[1.02]');
+            container.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        });
+
+        inputField.addEventListener('blur', () => {
+            container.classList.remove('scale-[1.02]');
+        });
+
+        // Simple parallax for background elements
+        window.addEventListener('mousemove', (e) => {
+            const icons = document.querySelectorAll('.material-symbols-outlined.text-6xl');
+            const x = (e.clientX - window.innerWidth / 2) / 50;
+            const y = (e.clientY - window.innerHeight / 2) / 50;
+            
+            icons.forEach((icon, i) => {
+                const multiplier = i === 0 ? 1 : -1;
+                icon.parentElement.style.transform = `translate(${x * multiplier}px, ${y * multiplier}px)`;
+            });
+        });
+    </script>
+
+
+</body></html>

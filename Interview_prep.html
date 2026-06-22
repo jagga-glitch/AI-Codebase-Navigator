@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Interview Mode | NavigatorAI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;family=JetBrains+Mono:wght@400;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Technical Minimalist Transitions */
+        .card-expand {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-panel {
+            background: rgba(22, 27, 34, 0.8);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#adc6ff",
+                        "on-tertiary-fixed": "#23005c",
+                        "inverse-on-surface": "#2e3037",
+                        "tertiary-fixed": "#e9ddff",
+                        "on-tertiary": "#3c0091",
+                        "tertiary": "#d0bcff",
+                        "primary-fixed": "#d8e2ff",
+                        "on-error-container": "#ffdad6",
+                        "on-surface-variant": "#c2c6d6",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-primary-container": "#00285d",
+                        "surface-dim": "#111319",
+                        "on-secondary-container": "#00311f",
+                        "on-surface": "#e2e2eb",
+                        "on-tertiary-container": "#340080",
+                        "surface-tint": "#adc6ff",
+                        "surface": "#111319",
+                        "surface-container-highest": "#33343b",
+                        "error-container": "#93000a",
+                        "error": "#ffb4ab",
+                        "surface-container-lowest": "#0c0e14",
+                        "inverse-primary": "#005ac2",
+                        "surface-bright": "#373940",
+                        "on-secondary": "#003824",
+                        "surface-container-high": "#282a30",
+                        "outline-variant": "#424754",
+                        "on-tertiary-fixed-variant": "#5516be",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-secondary-fixed": "#002113",
+                        "outline": "#8c909f",
+                        "primary-container": "#4d8eff",
+                        "on-primary-fixed": "#001a42",
+                        "on-error": "#690005",
+                        "secondary-container": "#00a572",
+                        "secondary": "#4edea3",
+                        "secondary-fixed-dim": "#4edea3",
+                        "tertiary-container": "#a078ff",
+                        "background": "#111319",
+                        "inverse-surface": "#e2e2eb",
+                        "surface-container-low": "#191b22",
+                        "tertiary-fixed-dim": "#d0bcff",
+                        "surface-container": "#1e1f26",
+                        "on-primary-fixed-variant": "#004395",
+                        "surface-variant": "#33343b",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-primary": "#002e6a",
+                        "on-background": "#e2e2eb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "gutter": "16px",
+                        "sidebar-width": "280px",
+                        "container-padding": "24px",
+                        "unit": "4px",
+                        "stack-lg": "32px"
+                    },
+                    "fontFamily": {
+                        "code-sm": ["JetBrains Mono"],
+                        "label-caps": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "code-md": ["JetBrains Mono"],
+                        "headline-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "code-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "code-md": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary/30">
+<!-- SIDEBAR (SideNavBar Shared Component) -->
+<aside class="h-screen w-sidebar-width fixed left-0 top-0 bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant flex flex-col py-stack-lg z-50">
+<div class="px-container-padding mb-stack-lg flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-[20px]" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">AI CodeBase</h1>
+<p class="text-[10px] uppercase tracking-widest text-outline">v1.2.0</p>
+</div>
+</div>
+<nav class="flex-1 px-stack-sm space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer active:scale-95" href="intelligence_dashboard.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer active:scale-95" href="file_history.html">
+<span class="material-symbols-outlined">history</span>
+<span class="font-body-md text-body-md">Repository History</span>
+</a>
+<!-- Active State for Interview Mode (Logical map to settings/tools) -->
+<div class="flex items-center gap-3 px-4 py-3 rounded text-primary dark:text-primary-fixed border-l-2 border-primary bg-surface-container-high cursor-pointer active:scale-95">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-body-md text-body-md">Interview Mode</span>
+</div>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer active:scale-95" href="repo_dashboard.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-stack-sm border-t border-outline-variant pt-stack-md">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container transition-colors" href="chat_assistant.html">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span class="text-body-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container transition-colors" href="api_documentation.html">
+<span class="material-symbols-outlined text-[20px]">description</span>
+<span class="text-body-md">Documentation</span>
+</a>
+</div>
+</aside>
+<!-- TOP NAV (TopNavBar Shared Component) -->
+<header class="fixed top-0 right-0 h-16 bg-surface dark:bg-surface border-b border-outline-variant flex items-center justify-between w-[calc(100%-280px)] ml-sidebar-width px-container-padding z-40">
+<div class="flex items-center gap-8">
+<div class="relative w-80">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg pl-10 pr-4 py-1.5 font-code-md text-code-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="Search questions or topics..." type="text"/>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="index.html">Explorer</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="analysisAndArchitecture.html">Architecture</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-lg text-body-lg" href="Interview_prep.html">Insights</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings_ethernet</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline">
+<img class="w-full h-full object-cover" data-alt="Close up portrait of a professional software engineer with a focused expression, set against a background of dimly lit server racks and glowing data centers. The lighting is cold blue and cyan, emphasizing a high-tech developer environment. Minimalist and sharp aesthetic consistent with a premium technical platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwk7lDZ2tiWVB0l5ruM735dKAnVdm-GgOzf0V1j6mFVx9IASm0Nu7HuHaj_dCHPQUchsilqHh4rt98XA6CcMrrJ6S2iylH5-v8ex_zCKj-PvPSQcaV5XLRBi5TP0hxxjbKjmrFbvWuFntRkyoHzc1mSkWDGrV1ElMNQ4vpOwKZ6GX3Dlf0qSS0UJSbRcUZzwMbg-1kUFkY9QxxffSpMvKFiCymmd3dvngc4Ly-KdMO3wSqzsyoMAJtEIgYduv2HDv46u5sKqqaSVqy"/>
+</div>
+</div>
+</header>
+<!-- MAIN CANVAS -->
+<main class="ml-sidebar-width mt-16 p-container-padding min-h-[calc(100vh-64px)] bg-surface-dim">
+<!-- Header Section -->
+<div class="mb-stack-lg relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container p-stack-lg">
+<div class="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<span class="inline-block px-3 py-1 bg-secondary-container/20 text-secondary border border-secondary/30 rounded-full font-label-caps text-label-caps mb-2">MODE: INTERVIEW PREP</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tighter">Navigator Interview Mode</h2>
+<p class="text-on-surface-variant font-body-lg text-body-lg mt-2 max-w-2xl">Refine your technical communication. AI-generated scenarios based on current industry benchmarks in architecture, system design, and security.</p>
+</div>
+<div class="flex gap-2">
+<button class="px-6 py-2 bg-primary text-on-primary-container font-bold rounded-lg hover:brightness-110 active:scale-95 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span> Start Session
+                    </button>
+<button class="px-6 py-2 bg-surface-container-high border border-outline-variant text-on-surface font-bold rounded-lg hover:bg-surface-container-highest active:scale-95 transition-all">
+                        History
+                    </button>
+</div>
+</div>
+<!-- Background Decoration -->
+<div class="absolute right-0 top-0 w-1/3 h-full opacity-10 pointer-events-none">
+
+</div>
+</div>
+<!-- Bento Grid Categories -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- COLUMN: Architecture -->
+<section class="space-y-stack-md">
+<div class="flex items-center gap-2 px-2">
+<span class="material-symbols-outlined text-primary">account_tree</span>
+<h3 class="font-headline-sm text-headline-sm text-primary uppercase tracking-wider">Architecture</h3>
+</div>
+<!-- Card 1 -->
+<div class="group bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden transition-all hover:border-primary/50">
+<div class="p-stack-md">
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-caps text-label-caps text-secondary">Level: Senior</span>
+<span class="text-outline font-code-sm text-code-sm">#ARC-082</span>
+</div>
+<h4 class="font-body-lg text-body-lg font-bold text-on-surface leading-tight">Explain the Trade-offs between Microservices and Monoliths in High-Concurrency Systems.</h4>
+</div>
+<div class="px-stack-md pb-stack-md">
+<button class="flex items-center gap-2 text-primary font-code-md text-code-md hover:underline group/btn" onclick="toggleAnswer(this)">
+<span class="material-symbols-outlined transition-transform group-active/btn:translate-y-1">expand_more</span>
+                            View Expected Answer
+                        </button>
+</div>
+<div class="hidden-answer max-h-0 overflow-hidden transition-all duration-300 bg-surface-container-highest/30">
+<div class="p-stack-md font-body-md text-body-md text-on-surface-variant border-t border-outline-variant">
+<p class="mb-2">A strong answer should cover:</p>
+<ul class="list-disc ml-5 space-y-1">
+<li><strong>Latency:</strong> Monoliths have lower internal latency (in-memory calls) vs Microservices (network overhead).</li>
+<li><strong>Scalability:</strong> Microservices allow selective scaling of bottlenecks.</li>
+<li><strong>Complexity:</strong> Distributed transaction management (Saga pattern) vs ACID in monoliths.</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden transition-all hover:border-primary/50">
+<div class="p-stack-md">
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-caps text-label-caps text-secondary">Level: Staff</span>
+<span class="text-outline font-code-sm text-code-sm">#ARC-104</span>
+</div>
+<h4 class="font-body-lg text-body-lg font-bold text-on-surface leading-tight">Describe the CAP theorem and how it influences the choice of a distributed database.</h4>
+</div>
+<div class="px-stack-md pb-stack-md">
+<button class="flex items-center gap-2 text-primary font-code-md text-code-md hover:underline group/btn" onclick="toggleAnswer(this)">
+<span class="material-symbols-outlined transition-transform group-active/btn:translate-y-1">expand_more</span>
+                            View Expected Answer
+                        </button>
+</div>
+<div class="hidden-answer max-h-0 overflow-hidden transition-all duration-300 bg-surface-container-highest/30">
+<div class="p-stack-md font-body-md text-body-md text-on-surface-variant border-t border-outline-variant">
+                            Emphasis on Consistency vs Availability in the face of Network Partition. Mention "Eventually Consistent" models like DynamoDB vs "Strongly Consistent" like Spanner.
+                        </div>
+</div>
+</div>
+</section>
+<!-- COLUMN: Design -->
+<section class="space-y-stack-md">
+<div class="flex items-center gap-2 px-2">
+<span class="material-symbols-outlined text-tertiary">polyline</span>
+<h3 class="font-headline-sm text-headline-sm text-tertiary uppercase tracking-wider">System Design</h3>
+</div>
+<!-- Card 1 -->
+<div class="group bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden transition-all hover:border-tertiary/50">
+<div class="p-stack-md">
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-caps text-label-caps text-tertiary">Level: Intermediate</span>
+<span class="text-outline font-code-sm text-code-sm">#DSN-012</span>
+</div>
+<h4 class="font-body-lg text-body-lg font-bold text-on-surface leading-tight">Design a global rate limiter for a public API serving 1M requests per second.</h4>
+</div>
+<div class="px-stack-md pb-stack-md">
+<button class="flex items-center gap-2 text-primary font-code-md text-code-md hover:underline group/btn" onclick="toggleAnswer(this)">
+<span class="material-symbols-outlined transition-transform group-active/btn:translate-y-1">expand_more</span>
+                            View Expected Answer
+                        </button>
+</div>
+<div class="hidden-answer max-h-0 overflow-hidden transition-all duration-300 bg-surface-container-highest/30">
+<div class="p-stack-md font-body-md text-body-md text-on-surface-variant border-t border-outline-variant">
+                            Discuss Token Bucket or Leaky Bucket algorithms. Suggest using Redis for distributed state management and local caches to reduce global hits.
+                        </div>
+</div>
+</div>
+<!-- Card 2 (With Image Asset) -->
+<div class="group bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden transition-all hover:border-tertiary/50">
+<div class="h-32 w-full bg-surface-container-highest">
+<img class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-500" data-alt="A clean, technical 2D system architecture diagram featuring blue and white nodes connected by thin glowing lines. It shows a load balancer, multiple web servers, and a distributed cache layer. Minimalist style with deep slate background, professional for a developer documentation site." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUFY-HTK9pKZsRqVoNZgalICJNlRiijqionvlCm6iOuHT4kGaS444VZbWOJMfg__I5ECiSEO4TDw5nNE783286PR1Ro8giJGvV8GMR7OnMnrgD-CEgvOarRt9052e1_wv-t0ERoUSHr7KT3YHawg51y5GF7F77dgYsDVUzliwyL0ZPSEPTQYp_3Pk42Sf7eV3RmR3odPc096c_X4eC2x48f-Vi0cLogZZqkLSLgkFG4dLblTgs6ExTY_bC35kHF3TfM_XFwv6Vv5VS"/>
+</div>
+<div class="p-stack-md">
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-caps text-label-caps text-tertiary">Scenario Analysis</span>
+<span class="text-outline font-code-sm text-code-sm">#DSN-441</span>
+</div>
+<h4 class="font-body-lg text-body-lg font-bold text-on-surface leading-tight">Identify the Single Point of Failure (SPOF) in the architecture shown above.</h4>
+</div>
+<div class="px-stack-md pb-stack-md">
+<button class="flex items-center gap-2 text-primary font-code-md text-code-md hover:underline group/btn" onclick="toggleAnswer(this)">
+<span class="material-symbols-outlined transition-transform group-active/btn:translate-y-1">expand_more</span>
+                            View Expected Answer
+                        </button>
+</div>
+<div class="hidden-answer max-h-0 overflow-hidden transition-all duration-300 bg-surface-container-highest/30">
+<div class="p-stack-md font-body-md text-body-md text-on-surface-variant border-t border-outline-variant">
+                            The primary DB instance without a standby. Solution: Implement Multi-AZ replication with automatic failover.
+                        </div>
+</div>
+</div>
+</section>
+<!-- COLUMN: Security -->
+<section class="space-y-stack-md">
+<div class="flex items-center gap-2 px-2">
+<span class="material-symbols-outlined text-error">security</span>
+<h3 class="font-headline-sm text-headline-sm text-error uppercase tracking-wider">Security</h3>
+</div>
+<!-- Card 1 -->
+<div class="group bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden transition-all hover:border-error/50">
+<div class="p-stack-md">
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-caps text-label-caps text-error">Critical</span>
+<span class="text-outline font-code-sm text-code-sm">#SEC-009</span>
+</div>
+<h4 class="font-body-lg text-body-lg font-bold text-on-surface leading-tight">How do you prevent JWT hijacking and Cross-Site Scripting (XSS) in a SPA?</h4>
+</div>
+<div class="px-stack-md pb-stack-md">
+<button class="flex items-center gap-2 text-primary font-code-md text-code-md hover:underline group/btn" onclick="toggleAnswer(this)">
+<span class="material-symbols-outlined transition-transform group-active/btn:translate-y-1">expand_more</span>
+                            View Expected Answer
+                        </button>
+</div>
+<div class="hidden-answer max-h-0 overflow-hidden transition-all duration-300 bg-surface-container-highest/30">
+<div class="p-stack-md font-body-md text-body-md text-on-surface-variant border-t border-outline-variant">
+                            Use HttpOnly and Secure flags for cookies. Implement Content Security Policy (CSP) headers. Sanitize all user input on the server side.
+                        </div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden transition-all hover:border-error/50">
+<div class="p-stack-md">
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-caps text-label-caps text-error">SOC2 Compliance</span>
+<span class="text-outline font-code-sm text-code-sm">#SEC-088</span>
+</div>
+<h4 class="font-body-lg text-body-lg font-bold text-on-surface leading-tight">Explain the concept of 'Least Privilege' in the context of IAM roles.</h4>
+</div>
+<div class="px-stack-md pb-stack-md">
+<button class="flex items-center gap-2 text-primary font-code-md text-code-md hover:underline group/btn" onclick="toggleAnswer(this)">
+<span class="material-symbols-outlined transition-transform group-active/btn:translate-y-1">expand_more</span>
+                            View Expected Answer
+                        </button>
+</div>
+<div class="hidden-answer max-h-0 overflow-hidden transition-all duration-300 bg-surface-container-highest/30">
+<div class="p-stack-md font-body-md text-body-md text-on-surface-variant border-t border-outline-variant">
+                            Granting only the permissions necessary to perform a task. Reduces blast radius during a compromise. Use session-bound tokens and MFA.
+                        </div>
+</div>
+</div>
+</section>
+</div>
+<!-- Progress Overview -->
+<div class="mt-stack-lg border border-outline-variant bg-surface-container-low rounded-lg p-stack-md">
+<div class="flex flex-col md:flex-row items-center gap-6">
+<div class="relative w-24 h-24 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90">
+<circle class="text-surface-container-highest" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-secondary transition-all duration-1000" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="80" stroke-width="8"></circle>
+</svg>
+<span class="absolute font-headline-sm text-headline-sm text-on-surface">68%</span>
+</div>
+<div class="flex-1">
+<h5 class="font-body-lg text-body-lg font-bold text-on-surface">Overall Readiness Score</h5>
+<p class="text-on-surface-variant text-body-md">You've mastered Security concepts but need more practice on Architecture trade-offs.</p>
+<div class="mt-2 grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="p-2 bg-surface-container rounded border border-outline-variant">
+<p class="text-[10px] text-outline uppercase">Questions Solved</p>
+<p class="font-bold text-primary">142</p>
+</div>
+<div class="p-2 bg-surface-container rounded border border-outline-variant">
+<p class="text-[10px] text-outline uppercase">Accuracy</p>
+<p class="font-bold text-secondary">92%</p>
+</div>
+<div class="p-2 bg-surface-container rounded border border-outline-variant">
+<p class="text-[10px] text-outline uppercase">Time Spent</p>
+<p class="font-bold text-tertiary">12.4h</p>
+</div>
+<div class="p-2 bg-surface-container rounded border border-outline-variant">
+<p class="text-[10px] text-outline uppercase">Global Rank</p>
+<p class="font-bold text-on-surface">Top 5%</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- RIGHT DRAWER (NavigationDrawer Shared Component) -->
+<div class="fixed right-0 top-16 h-[calc(100vh-64px)] w-80 bg-surface-container dark:bg-surface-container border-l border-outline-variant flex flex-col z-40">
+<div class="p-container-padding">
+<h6 class="font-label-caps text-label-caps text-secondary uppercase mb-4">Chat Assistant</h6>
+<div class="space-y-4">
+<div class="bg-surface-container-high p-3 rounded-lg border border-outline-variant">
+<p class="font-code-md text-code-md text-on-surface mb-2">Connected to Repo: <span class="text-secondary">main-api-v2</span></p>
+<p class="text-[12px] text-on-surface-variant italic">"Ask me to generate a mock question based on your codebase history."</p>
+</div>
+<nav class="space-y-2">
+<div class="flex items-center gap-3 p-2 rounded hover:bg-surface-container-high cursor-pointer transition-all">
+<span class="material-symbols-outlined text-secondary">chat</span>
+<span class="font-code-md text-code-md">Chat History</span>
+</div>
+<div class="flex items-center gap-3 p-2 rounded hover:bg-surface-container-high cursor-pointer transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">bookmarks</span>
+<span class="font-code-md text-code-md">Saved Prompts</span>
+</div>
+<div class="flex items-center gap-3 p-2 rounded hover:bg-surface-container-high cursor-pointer transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">terminal</span>
+<span class="font-code-md text-code-md">System Status</span>
+</div>
+<div class="flex items-center gap-3 p-2 rounded hover:bg-surface-container-high cursor-pointer transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">menu_book</span>
+<span class="font-code-md text-code-md">Resources</span>
+</div>
+</nav>
+</div>
+</div>
+<div class="mt-auto p-container-padding border-t border-outline-variant">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
+<span class="font-code-sm text-code-sm text-on-surface-variant">AI Model: GPT-4-Turbo</span>
+</div>
+<div class="relative">
+<textarea class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-code-sm text-code-sm resize-none focus:ring-1 focus:ring-secondary outline-none" placeholder="Message AI..." rows="3"></textarea>
+<button class="absolute bottom-2 right-2 text-secondary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Micro-interaction Script -->
+<script>
+        function toggleAnswer(btn) {
+            const answerDiv = btn.parentElement.nextElementSibling;
+            const icon = btn.querySelector('.material-symbols-outlined');
+            
+            if (answerDiv.style.maxHeight === '0px' || !answerDiv.style.maxHeight) {
+                // Open
+                answerDiv.style.maxHeight = answerDiv.scrollHeight + 'px';
+                icon.style.transform = 'rotate(180deg)';
+                btn.classList.add('text-secondary');
+                btn.innerHTML = `<span class="material-symbols-outlined transition-transform" style="transform: rotate(180deg)">expand_more</span> Hide Answer`;
+            } else {
+                // Close
+                answerDiv.style.maxHeight = '0px';
+                icon.style.transform = 'rotate(0deg)';
+                btn.classList.remove('text-secondary');
+                btn.innerHTML = `<span class="material-symbols-outlined transition-transform">expand_more</span> View Expected Answer`;
+            }
+        }
+    </script>
+</body></html>

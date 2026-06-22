@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI CodeBase - Chat Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --sidebar-width: 280px;
+            --drawer-width: 320px;
+        }
+        body {
+            background-color: #0F1117;
+            color: #e2e2eb;
+            overflow-x: hidden;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #111319;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #424754;
+            border-radius: 10px;
+        }
+        .code-block {
+            background-color: #090B0F;
+            border: 1px solid #1E293B;
+        }
+        .glass-panel {
+            background: rgba(22, 27, 34, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid #1E293B;
+        }
+        .active-pill {
+            position: relative;
+        }
+        .active-pill::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 25%;
+            height: 50%;
+            width: 2px;
+            background-color: #adc6ff;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#373940",
+                        "on-primary": "#002e6a",
+                        "on-primary-fixed": "#001a42",
+                        "on-secondary-fixed": "#002113",
+                        "outline": "#8c909f",
+                        "primary": "#adc6ff",
+                        "inverse-surface": "#e2e2eb",
+                        "on-background": "#e2e2eb",
+                        "on-primary-fixed-variant": "#004395",
+                        "secondary": "#4edea3",
+                        "tertiary-fixed": "#e9ddff",
+                        "on-tertiary-fixed": "#23005c",
+                        "surface-container": "#1e1f26",
+                        "primary-container": "#4d8eff",
+                        "surface-container-high": "#282a30",
+                        "on-secondary-container": "#00311f",
+                        "secondary-fixed-dim": "#4edea3",
+                        "primary-fixed": "#d8e2ff",
+                        "on-secondary": "#003824",
+                        "secondary-container": "#00a572",
+                        "error-container": "#93000a",
+                        "on-surface-variant": "#c2c6d6",
+                        "surface-container-low": "#191b22",
+                        "on-tertiary-container": "#340080",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-highest": "#33343b",
+                        "error": "#ffb4ab",
+                        "background": "#111319",
+                        "surface-dim": "#111319",
+                        "surface-container-lowest": "#0c0e14",
+                        "on-surface": "#e2e2eb",
+                        "on-tertiary-fixed-variant": "#5516be",
+                        "inverse-primary": "#005ac2",
+                        "tertiary": "#d0bcff",
+                        "surface": "#111319",
+                        "outline-variant": "#424754",
+                        "surface-tint": "#adc6ff",
+                        "tertiary-fixed-dim": "#d0bcff",
+                        "tertiary-container": "#a078ff",
+                        "surface-variant": "#33343b",
+                        "inverse-on-surface": "#2e3037",
+                        "on-secondary-fixed-variant": "#005236",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-primary-container": "#00285d",
+                        "on-error": "#690005"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sidebar-width": "280px",
+                        "stack-sm": "8px",
+                        "unit": "4px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "gutter": "16px",
+                        "container-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "code-md": ["JetBrains Mono"],
+                        "label-caps": ["JetBrains Mono"],
+                        "code-sm": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "code-md": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "code-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md text-body-md overflow-hidden">
+<!-- SIDEBAR (Anchor: SideNavBar) -->
+<aside class="h-screen w-sidebar-width fixed left-0 top-0 bg-surface-container-low border-r border-outline-variant flex-col py-stack-lg z-50 hidden md:flex">
+<div class="px-container-padding mb-stack-lg">
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">AI CodeBase</h1>
+<p class="text-on-surface-variant text-code-sm font-code-sm">v1.2.0</p>
+</div>
+<nav class="flex-1 px-stack-sm space-y-1">
+<a class="flex items-center px-stack-md py-stack-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer active:scale-95 group" href="intelligence_dashboard.html">
+<span class="material-symbols-outlined mr-stack-md group-hover:text-primary">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center px-stack-md py-stack-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer active:scale-95 group" href="file_history.html">
+<span class="material-symbols-outlined mr-stack-md group-hover:text-primary">history</span>
+<span>Repository History</span>
+</a>
+<a class="flex items-center px-stack-md py-stack-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer active:scale-95 group" href="repo_dashboard.html">
+<span class="material-symbols-outlined mr-stack-md group-hover:text-primary">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-stack-sm space-y-1 border-t border-outline-variant pt-stack-md">
+<a class="flex items-center px-stack-md py-stack-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer active:scale-95 group" href="api_documentation.html">
+<span class="material-symbols-outlined mr-stack-md group-hover:text-primary">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center px-stack-md py-stack-sm text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer active:scale-95 group" href="chat_assistant.html">
+<span class="material-symbols-outlined mr-stack-md group-hover:text-primary">description</span>
+<span>Documentation</span>
+</a>
+<div class="flex items-center px-stack-md py-stack-md mt-stack-md">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-highest mr-stack-md">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a software engineer in a high-tech studio environment with soft blue rim lighting and a blurred digital background, emphasizing technical expertise and modern minimalism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCx8LQyR0dvs7RW_YSmixyHfT5cQxyzPMytUZp6j786Sw2ZDxeojXS5vxb6sfFnUI7Z06ydDaVOk4MD5ebpgkq26F_pJN2Me9UAHFTVvyvzyGOcDm5iiYol6_A2LGs3U29mRUl42SUrhVN7YrK8-T5vvkWvabTFxdg3ixaxPG1pDbMsbWPZKtYnvABJA3WT6pwSo7K_vC-EQ4OyEuBoqDMPJBidDyZrgzomRmgTxLFPb2KSV6X9nLP1cBOoBBJV6HHxPQeMDEFM2R-i"/>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">Alex Dev</span>
+<span class="text-xs text-on-surface-variant">Core Contributor</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- TOP NAVBAR (Anchor: TopNavBar) -->
+<header class="fixed top-0 right-0 h-14 md:h-16 left-0 md:left-auto md:w-[calc(100%-280px)] md:ml-sidebar-width bg-surface border-b border-outline-variant flex items-center justify-between px-3 md:px-container-padding z-40">
+<div class="flex items-center gap-2 md:gap-stack-lg">
+<span class="font-headline-md text-headline-md font-black text-on-surface">Navigator</span>
+<div class="hidden sm:flex items-center bg-surface-container-lowest border border-outline-variant rounded-lg px-stack-md py-1 w-64 group focus-within:border-primary transition-all">
+<span class="material-symbols-outlined text-outline group-focus-within:text-primary">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md font-code-md w-full ml-2 text-on-surface" placeholder="Search Repo..." type="text"/>
+</div>
+</div>
+<nav class="hidden lg:flex items-center gap-stack-lg">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="index.html">Overview</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="analysisAndArchitecture.html">Architecture</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="api_documentation.html">API Docs</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-lg text-body-lg" href="chat_assistant.html">Chat Assistant</a>
+
+
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="Interview_prep.html">Interview Prep</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="learning.html">Learning</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="repo_dashboard.html">Repo Dashboard</a>
+</nav>
+<div class="flex items-center gap-stack-md">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-all"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-all"><span class="material-symbols-outlined">settings_ethernet</span></button>
+</div>
+</header>
+<!-- MAIN CANVAS -->
+<main class="ml-0 md:ml-sidebar-width mt-14 md:mt-16 h-[calc(100vh-56px)] md:h-[calc(100vh-64px)] w-full md:w-[calc(100%-280px-320px)] grid grid-cols-1 md:grid-cols-[240px_1fr_280px] relative bg-background overflow-hidden"><aside class="hidden md:block border-r border-outline-variant bg-surface-container-lowest overflow-y-auto custom-scrollbar p-stack-md">
+<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-sy transition-colors font-body-lg text-body-lg" href="code_asistant.html">Code Assistant</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="file_history.html">Repository History</a>tack-md">Suggested Questions</h4>
+<div class="space-y-stack-sm">
+<button class="w-full glass-panel p-stack-sm text-left hover:border-primary transition-all group text-xs">
+<span class="material-symbols-outlined text-primary text-sm mb-1">lock</span>
+<p class="text-on-surface font-bold">Auth Logic</p>
+</button>
+<button class="w-full glass-panel p-stack-sm text-left hover:border-primary transition-all group text-xs">
+<span class="material-symbols-outlined text-secondary text-sm mb-1">database</span>
+<p class="text-on-surface font-bold">DB Schema</p>
+</button>
+<button class="w-full glass-panel p-stack-sm text-left hover:border-primary transition-all group text-xs">
+<span class="material-symbols-outlined text-tertiary text-sm mb-1">account_tree</span>
+<p class="text-on-surface font-bold">Middleware Flow</p>
+</button>
+</div>
+</aside>
+<!-- Chat Area -->
+<div class="flex flex-col h-full overflow-hidden border-r border-outline-variant">
+<div class="p-stack-md border-b border-outline-variant bg-surface-container-low">
+<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-stack-sm">Quick Actions</h4>
+<div class="flex flex-wrap gap-2">
+<button class="px-3 py-1.5 bg-surface-container-highest border border-outline-variant rounded text-xs hover:border-primary transition-colors">Explain Architecture</button>
+<button class="px-3 py-1.5 bg-surface-container-highest border border-outline-variant rounded text-xs hover:border-primary transition-colors">Show Auth Flow</button>
+<button class="px-3 py-1.5 bg-surface-container-highest border border-outline-variant rounded text-xs hover:border-primary transition-colors">Generate Learning Path</button>
+<button class="px-3 py-1.5 bg-surface-container-highest border border-outline-variant rounded text-xs hover:border-primary transition-colors">Prepare Interview</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-stack-lg space-y-stack-lg" id="chat-container">
+<div class="flex gap-stack-md items-start max-w-3xl mx-auto w-full">
+<div class="w-8 h-8 rounded bg-primary-container flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-sm">auto_awesome</span>
+</div>
+<div class="flex-1 space-y-stack-md">
+<div class="text-on-surface leading-relaxed">How can I help you with the codebase today?</div>
+</div>
+</div>
+</div>
+<div class="p-stack-md bg-surface-container-low border-t border-outline-variant">
+<div class="glass-panel p-2 rounded-xl flex items-end gap-stack-sm shadow-2xl">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<textarea class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface font-body-md py-2 resize-none custom-scrollbar" placeholder="Ask anything..." rows="1"></textarea>
+<button class="bg-primary text-on-primary px-4 py-2 rounded font-bold flex items-center gap-stack-sm hover:opacity-90 transition-all">
+<span class="material-symbols-outlined text-sm">send</span>
+</button>
+</div>
+</div></div>
+<!-- Input Area -->
+<aside class="bg-surface-container-lowest overflow-y-auto custom-scrollbar p-stack-md space-y-stack-lg">
+<div>
+<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-stack-sm">Current Module</h4>
+<div class="p-stack-sm bg-surface-container rounded border border-outline-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">folder</span>
+<span class="text-xs font-code-sm">src/middleware</span>
+</div>
+</div>
+<div>
+<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-stack-sm">Current File</h4>
+<div class="p-stack-sm bg-surface-container rounded border border-outline-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-sm">description</span>
+<span class="text-xs font-code-sm">auth.ts</span>
+</div>
+</div>
+<div>
+<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-stack-sm">Dependencies</h4>
+<div class="space-y-1">
+<div class="text-[10px] px-2 py-1 bg-surface-container-high rounded border border-outline-variant">@prisma/client</div>
+<div class="text-[10px] px-2 py-1 bg-surface-container-high rounded border border-outline-variant">ioredis</div>
+<div class="text-[10px] px-2 py-1 bg-surface-container-high rounded border border-outline-variant">jsonwebtoken</div>
+</div>
+</div>
+<div>
+<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-stack-sm">Referenced Files</h4>
+<div class="space-y-1">
+<div class="text-[10px] text-primary hover:underline cursor-pointer">RedisAdapter.ts</div>
+<div class="text-[10px] text-primary hover:underline cursor-pointer">main.ts</div>
+</div>
+</div>
+</aside></main>
+<!-- RIGHT NAVIGATION DRAWER (Anchor: NavigationDrawer) -->
+<aside class="fixed right-0 top-16 h-[calc(100vh-64px)] w-80 bg-surface-container border-l border-outline-variant flex flex-col z-40">
+<div class="p-stack-md border-b border-outline-variant">
+<div class="flex items-center justify-between mb-stack-sm">
+<span class="font-label-caps text-label-caps text-secondary uppercase">Chat Assistant</span>
+<span class="material-symbols-outlined text-secondary text-sm">hub</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Connected to Repo</h3>
+<p class="text-xs text-on-surface-variant">Indexing main branch...</p>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar">
+<!-- Smart Onboarding Section -->
+<div class="p-stack-md">
+<h4 class="text-on-surface font-bold mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">school</span>
+                    Smart Onboarding
+                </h4>
+<div class="bg-surface-container-highest p-stack-md rounded border border-outline-variant space-y-stack-md">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-bold text-on-surface">Focused Learning</p>
+<p class="text-xs text-on-surface-variant">2-hour deep dive</p>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+</div>
+<div class="space-y-stack-sm">
+<div class="flex items-center gap-2 text-xs">
+<span class="material-symbols-outlined text-sm text-secondary">check_circle</span>
+<span>Core Infrastructure (30m)</span>
+</div>
+<div class="flex items-center gap-2 text-xs opacity-50">
+<span class="material-symbols-outlined text-sm">circle</span>
+<span>State Management (45m)</span>
+</div>
+<div class="flex items-center gap-2 text-xs opacity-50">
+<span class="material-symbols-outlined text-sm">circle</span>
+<span>API &amp; Edge Logic (45m)</span>
+</div>
+</div>
+<button class="w-full py-2 bg-secondary text-on-secondary font-bold rounded text-xs hover:opacity-90 transition-opacity">
+                        Resume Session
+                    </button>
+</div>
+</div>
+<!-- Interview Mode Toggle -->
+<div class="px-stack-md py-stack-sm border-t border-outline-variant mt-stack-md">
+<div class="flex items-center justify-between p-stack-md bg-surface-container-high rounded border border-outline-variant">
+<div>
+<p class="font-bold text-on-surface">Interview Mode</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Self-Assessment</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" id="interview-toggle" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="hidden mt-stack-md p-stack-md bg-secondary/10 border border-secondary/30 rounded" id="interview-prompt">
+<p class="text-xs italic text-secondary">"How does this codebase handle race conditions in the Redis increment logic?"</p>
+</div>
+</div>
+<!-- Chat History -->
+<div class="p-stack-md">
+<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-stack-md">Recent Insights</h4>
+<div class="space-y-stack-sm">
+<div class="p-stack-sm hover:bg-surface-container-high cursor-pointer rounded transition-colors group flex gap-stack-sm">
+<span class="material-symbols-outlined text-sm group-hover:text-primary">chat</span>
+<span class="text-xs truncate">Auth logic investigation</span>
+</div>
+<div class="p-stack-sm hover:bg-surface-container-high cursor-pointer rounded transition-colors group flex gap-stack-sm">
+<span class="material-symbols-outlined text-sm group-hover:text-primary">chat</span>
+<span class="text-xs truncate">DB Schema optimization ideas</span>
+</div>
+<div class="p-stack-sm hover:bg-surface-container-high cursor-pointer rounded transition-colors group flex gap-stack-sm">
+<span class="material-symbols-outlined text-sm group-hover:text-primary">chat</span>
+<span class="text-xs truncate">Deployment pipeline fix</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-stack-md border-t border-outline-variant flex items-center justify-between text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">terminal</span>
+<span class="text-xs font-code-sm">Connected</span>
+</div>
+<span class="material-symbols-outlined text-sm cursor-pointer hover:text-on-surface">open_in_new</span>
+</div>
+</aside>
+<script>
+        // Micro-interactions for the interview toggle
+        const toggle = document.getElementById('interview-toggle');
+        const prompt = document.getElementById('interview-prompt');
+
+        toggle.addEventListener('change', () => {
+            if (toggle.checked) {
+                prompt.classList.remove('hidden');
+                prompt.classList.add('animate-pulse');
+                setTimeout(() => prompt.classList.remove('animate-pulse'), 1000);
+            } else {
+                prompt.classList.add('hidden');
+            }
+        });
+
+        // Chat container auto-scroll on content add (Simulated)
+        const chat = document.getElementById('chat-container');
+        chat.scrollTop = chat.scrollHeight;
+
+        // Interactive "Active Pill" effect for sidebar
+        const navItems = document.querySelectorAll('nav .flex');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navItems.forEach(i => i.classList.remove('active-pill', 'text-primary', 'bg-surface-container-high'));
+                item.classList.add('active-pill', 'text-primary', 'bg-surface-container-high');
+            });
+        });
+        
+        // Default active tab for "Chat Assistant"
+        // (Since it's the current context, we'll mark Dashboard or similar if desired, 
+        // but here it's a dedicated view)
+    </script>
+</body></html>

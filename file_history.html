@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI CodeBase - Analysis Engine</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#373940",
+                        "on-primary": "#002e6a",
+                        "on-primary-fixed": "#001a42",
+                        "on-secondary-fixed": "#002113",
+                        "outline": "#8c909f",
+                        "primary": "#adc6ff",
+                        "inverse-surface": "#e2e2eb",
+                        "on-tertiary": "#3c0091",
+                        "on-background": "#e2e2eb",
+                        "on-primary-fixed-variant": "#004395",
+                        "secondary": "#4edea3",
+                        "tertiary-fixed": "#e9ddff",
+                        "on-tertiary-fixed": "#23005c",
+                        "surface-container": "#1e1f26",
+                        "primary-container": "#4d8eff",
+                        "surface-container-high": "#282a30",
+                        "on-secondary-container": "#00311f",
+                        "secondary-fixed-dim": "#4edea3",
+                        "primary-fixed": "#d8e2ff",
+                        "on-secondary": "#003824",
+                        "secondary-container": "#00a572",
+                        "error-container": "#93000a",
+                        "on-surface-variant": "#c2c6d6",
+                        "surface-container-low": "#191b22",
+                        "on-tertiary-container": "#340080",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-highest": "#33343b",
+                        "error": "#ffb4ab",
+                        "background": "#111319",
+                        "surface-dim": "#111319",
+                        "surface-container-lowest": "#0c0e14",
+                        "on-surface": "#e2e2eb",
+                        "on-tertiary-fixed-variant": "#5516be",
+                        "inverse-primary": "#005ac2",
+                        "tertiary": "#d0bcff",
+                        "surface": "#111319",
+                        "outline-variant": "#424754",
+                        "surface-tint": "#adc6ff",
+                        "tertiary-fixed-dim": "#d0bcff",
+                        "tertiary-container": "#a078ff",
+                        "surface-variant": "#33343b",
+                        "inverse-on-surface": "#2e3037",
+                        "on-secondary-fixed-variant": "#005236",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-primary-container": "#00285d",
+                        "on-error": "#690005"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sidebar-width": "280px",
+                        "stack-sm": "8px",
+                        "unit": "4px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "gutter": "16px",
+                        "container-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "code-md": ["JetBrains Mono"],
+                        "label-caps": ["JetBrains Mono"],
+                        "code-sm": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "code-md": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "code-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0F1117;
+            color: #e2e2eb;
+            overflow-x: hidden;
+        }
+        .code-editor-bg {
+            background-color: #090B0F;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #424754;
+            border-radius: 10px;
+        }
+        .active-file-indicator {
+            box-shadow: -2px 0 0 0 #adc6ff inset;
+        }
+        .dependency-line {
+            stroke: #424754;
+            stroke-dasharray: 4;
+            animation: dash 20s linear infinite;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: -1000; }
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased">
+<!-- SideNavBar (Shared Component) -->
+<aside class="h-screen w-sidebar-width fixed left-0 top-0 bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant flex flex-col py-stack-lg z-50">
+<div class="px-gutter mb-stack-lg">
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">AI CodeBase</h1>
+<p class="text-on-surface-variant opacity-60 text-[10px] tracking-widest uppercase">v1.2.0</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="px-gutter py-2 text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container cursor-pointer active:scale-95 transition-all flex items-center gap-3" href="intelligence_dashboard.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="px-gutter py-2 text-primary dark:text-primary-fixed border-l-2 border-primary bg-surface-container-high cursor-pointer active:scale-95 transition-all flex items-center gap-3" href="file_history.html">
+<span class="material-symbols-outlined">history</span>
+<span>Repository History</span>
+</a>
+<a class="px-gutter py-2 text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container cursor-pointer active:scale-95 transition-all flex items-center gap-3" href="repo_dashboard.html">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto space-y-1">
+<a class="px-gutter py-2 text-on-surface-variant hover:bg-surface-container-highest transition-colors duration-200 cursor-pointer flex items-center gap-3" href="chat_assistant.html">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-md text-body-md">Support</span>
+</a>
+<a class="px-gutter py-2 text-on-surface-variant hover:bg-surface-container-highest transition-colors duration-200 cursor-pointer flex items-center gap-3" href="api_documentation.html">
+<span class="material-symbols-outlined">description</span>
+<span class="font-body-md text-body-md">Documentation</span>
+</a>
+<div class="mt-4 px-gutter pt-4 border-t border-outline-variant flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A cinematic, high-definition portrait of a senior software architect with subtle salt-and-pepper hair, wearing a sleek black turtleneck, illuminated by the cool blue glow of multiple monitors in a darkened, high-tech workspace. The atmosphere is professional and intellectual, with a shallow depth of field focusing on the person's thoughtful expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCc2KGvEMkIhTscP7SaDLXjwAwE5nHqUzYud4ybJ3mPig9Ju6BP2-dvEgDFeAeG7o09KpM-bSUb0GNGG6it3Njs7zxiyEZmmUiALt1xz619HmfOc1xNOp_5wG2x5BK9Z8teO0PUdhykH99OSlRGpm3X-bjD9WNL2LIbc8IR0j50I9zPeLUVrDZIjfMXwB7ItvwS47i8pZ8XpnM9-61j2XhncMnXpdqktDqELvs1HvmeU-HS9GGki56JlCs5A4JzoV9n1n2bsy-ueHlj"/>
+</div>
+<div class="flex flex-col">
+<span class="text-[12px] font-bold">Alex Chen</span>
+<span class="text-[10px] text-on-surface-variant">Lead Developer</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar (Shared Component) -->
+<header class="fixed top-0 right-0 h-16 border-b border-outline-variant bg-surface dark:bg-surface flex items-center justify-between w-[calc(100%-280px)] ml-sidebar-width px-container-padding z-40">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-secondary text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md font-code-md p-0 w-64 placeholder:text-on-surface-variant" placeholder="Analyzing: AuthController.js" type="text"/>
+</div>
+<div class="flex items-center gap-6 ml-4">
+<span class="text-primary font-bold border-b-2 border-primary pb-1 font-body-lg text-body-lg cursor-pointer">Explorer</span>
+<span class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg cursor-pointer"><a href="analysisAndArchitecture.html">Architecture</a></span>
+<span class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg cursor-pointer">Insights</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all">settings_ethernet</button>
+<div class="h-8 w-8 rounded-lg bg-surface-container-highest border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A stylized digital avatar of a female software engineer, illustrated in a clean, modern vector art style using a palette of electric blue, deep slate, and soft grey. The avatar features short dark hair and a confident, neutral expression, set against a background of faint, scrolling code lines." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJyMmKdkJwBsV73gh5C5sWBH0EUSUp27Rul7jguiPviSG_I2Be-kKZuYI_lUK5q4sAXJFFtICojf9CakZjZmy6DpmPLPyvva33Poibg35IU0M6WaHBLm3BlKNs8oVD6eW3UDsIV89uC1wKzvCwImQ0pRqNJqIpiGrmRdN6eObAs3xbQILxXa4H8W6K704tzqtCBnrixFzAsWjNxzBKsn_cvC2Oxk_DYzVZSgbhmtrCIf7pUNB-SQd43mjbzNinhwvdNQF6msrF6qlb"/>
+</div>
+</div>
+</header>
+<!-- NavigationDrawer (Shared Component) - Contextual Sidebar -->
+<aside class="fixed right-0 top-16 h-[calc(100vh-64px)] w-80 bg-surface-container dark:bg-surface-container border-l border-outline-variant flex flex-col z-30">
+<div class="p-stack-md border-b border-outline-variant">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-caps text-label-caps text-secondary uppercase">Chat Assistant</span>
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+</div>
+<p class="text-[10px] text-on-surface-variant">Connected to Repo Context</p>
+</div>
+<div class="flex-1 overflow-y-auto p-stack-md space-y-4 custom-scrollbar">
+<div class="bg-surface-container-low p-3 rounded border border-outline-variant">
+<p class="text-code-sm font-code-md text-on-surface-variant mb-2">How does AuthController handle session expiration?</p>
+<p class="text-code-sm font-code-md text-secondary">The controller uses the `expireToken` helper in lines 142-156. It triggers a middleware injection that clears the local cookie and updates the Redis session store concurrently.</p>
+</div>
+<div class="flex gap-2 p-2 hover:bg-surface-container-highest transition-opacity duration-150 cursor-pointer rounded group">
+<span class="material-symbols-outlined text-sm text-on-surface-variant group-hover:text-secondary">chat</span>
+<span class="text-code-sm font-code-md text-on-surface-variant">Explain lines 45-60...</span>
+</div>
+<div class="flex gap-2 p-2 hover:bg-surface-container-highest transition-opacity duration-150 cursor-pointer rounded group">
+<span class="material-symbols-outlined text-sm text-on-surface-variant group-hover:text-secondary">bookmarks</span>
+<span class="text-code-sm font-code-md text-on-surface-variant">Saved: OAuth2 Flow</span>
+</div>
+</div>
+<div class="p-stack-md mt-auto bg-surface-container-highest border-t border-outline-variant">
+<div class="relative">
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant rounded p-3 text-code-sm font-code-md focus:ring-1 focus:ring-secondary focus:outline-none placeholder:text-on-surface-variant resize-none" placeholder="Ask about AuthController.js..." rows="2"></textarea>
+<button class="absolute bottom-3 right-3 material-symbols-outlined text-secondary">send</button>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-sidebar-width mr-80 pt-16 min-h-screen bg-background p-gutter">
+<div class="max-w-[1200px] mx-auto">
+<!-- Analysis Header -->
+<div class="flex items-center justify-between mb-stack-lg">
+<div class="flex flex-col">
+<h2 class="font-headline-md text-headline-md text-on-surface">Analysis: <span class="text-primary">AuthController.js</span></h2>
+<p class="text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">schedule</span> Last synced 2 mins ago
+                        <span class="mx-2">•</span>
+<span class="material-symbols-outlined text-sm text-secondary">check_circle</span> 0 Security Issues
+                    </p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 bg-surface-container-high border border-outline-variant px-4 py-2 rounded-lg hover:bg-surface-container-highest transition-all text-on-surface-variant text-body-md">
+<span class="material-symbols-outlined text-sm">download</span> Export Report
+                    </button>
+<button class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-lg hover:opacity-90 transition-all font-bold text-body-md">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span> Re-analyze
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- File Browser & Code View -->
+<div class="col-span-12 lg:col-span-7 space-y-gutter">
+<div class="bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden">
+<div class="bg-surface-container-high px-4 py-2 border-b border-outline-variant flex items-center justify-between">
+<div class="flex gap-2">
+<span class="w-3 h-3 rounded-full bg-error/40"></span>
+<span class="w-3 h-3 rounded-full bg-secondary/40"></span>
+<span class="w-3 h-3 rounded-full bg-primary/40"></span>
+</div>
+<span class="font-code-md text-code-sm text-on-surface-variant">src/controllers/AuthController.js</span>
+</div>
+<div class="flex h-[400px]">
+<!-- Sidebar File List (Condensed) -->
+<div class="w-12 border-r border-outline-variant bg-surface-container-lowest flex flex-col items-center py-4 gap-6">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">folder</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-white transition-colors cursor-pointer">search</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-white transition-colors cursor-pointer">art_track</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-white transition-colors cursor-pointer">terminal</span>
+</div>
+<!-- Editor Area -->
+<div class="flex-1 code-editor-bg p-4 font-code-md text-code-sm overflow-y-auto custom-scrollbar leading-relaxed">
+<div class="flex gap-4">
+<div class="text-outline/40 text-right select-none w-8">
+                                        1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15<br/>16
+                                    </div>
+<div class="flex-1">
+<div class="text-secondary">import</div> <span class="text-tertiary">{ login, logout }</span> <span class="text-secondary">from</span> <span class="text-primary-container">'@services/authService'</span>;<br/>
+<div class="text-secondary">import</div> <span class="text-tertiary">Logger</span> <span class="text-secondary">from</span> <span class="text-primary-container">'@utils/logger'</span>;<br/>
+<br/>
+<div class="text-secondary">export const</div> <span class="text-tertiary">AuthController</span> = {<br/>
+                                          <span class="text-primary">handleLogin</span>: <span class="text-secondary">async</span> (req, res) =&gt; {<br/>
+                                            <span class="text-secondary">try</span> {<br/>
+                                              <span class="text-secondary">const</span> { email, password } = req.body;<br/>
+                                              <span class="text-outline/60">// Validate user credentials</span><br/>
+                                              <span class="text-secondary">const</span> result = <span class="text-secondary">await</span> login(email, password);<br/>
+                                              <span class="text-tertiary">Logger</span>.info(<span class="text-primary-container">'User logged in successfully'</span>);<br/>
+                                              <span class="text-secondary">return</span> res.status(200).json(result);<br/>
+                                            } <span class="text-secondary">catch</span> (error) {<br/>
+                                              <span class="text-tertiary">Logger</span>.error(error);<br/>
+                                              <span class="text-secondary">return</span> res.status(401).json({ error: <span class="text-primary-container">'Invalid credentials'</span> });<br/>
+                                            }<br/>
+                                          },<br/>
+                                        ...
+                                    </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Dependency Analyzer Table -->
+<div class="bg-surface-container border border-outline-variant rounded-xl p-stack-md">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">integration_instructions</span> Dependency Analyzer
+                        </h3>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="border-b border-outline-variant">
+<tr>
+<th class="py-3 px-4 text-label-caps text-on-surface-variant font-bold">Package Name</th>
+<th class="py-3 px-4 text-label-caps text-on-surface-variant font-bold">Version</th>
+<th class="py-3 px-4 text-label-caps text-on-surface-variant font-bold">Purpose</th>
+<th class="py-3 px-4 text-label-caps text-on-surface-variant font-bold text-right">Status</th>
+</tr>
+</thead>
+<tbody class="text-body-md">
+<tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+<td class="py-3 px-4 font-code-md">jsonwebtoken</td>
+<td class="py-3 px-4 text-on-surface-variant">^9.0.0</td>
+<td class="py-3 px-4 text-on-surface-variant">Handles JWT signing and verification for sessions.</td>
+<td class="py-3 px-4 text-right"><span class="bg-secondary/10 text-secondary border border-secondary/20 px-2 py-0.5 rounded text-[10px] font-bold">SECURE</span></td>
+</tr>
+<tr class="border-b border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+<td class="py-3 px-4 font-code-md">bcryptjs</td>
+<td class="py-3 px-4 text-on-surface-variant">^2.4.3</td>
+<td class="py-3 px-4 text-on-surface-variant">Salting and hashing for secure password storage.</td>
+<td class="py-3 px-4 text-right"><span class="bg-secondary/10 text-secondary border border-secondary/20 px-2 py-0.5 rounded text-[10px] font-bold">SECURE</span></td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="py-3 px-4 font-code-md">redis</td>
+<td class="py-3 px-4 text-on-surface-variant">^4.5.1</td>
+<td class="py-3 px-4 text-on-surface-variant">Cache store for managing active session blacklists.</td>
+<td class="py-3 px-4 text-right"><span class="bg-error/10 text-error border border-error/20 px-2 py-0.5 rounded text-[10px] font-bold">UPDATE REQ.</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Right Column: AI Explanation & Architecture -->
+<div class="col-span-12 lg:col-span-5 space-y-gutter"><div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container border border-outline-variant rounded-xl p-4">
+<h4 class="text-label-caps font-bold text-secondary mb-2 uppercase tracking-widest">Complexity Score</h4>
+<div class="flex items-baseline gap-1">
+<span class="text-3xl font-bold text-primary">8.2</span>
+<span class="text-on-surface-variant text-sm">/10</span>
+</div>
+</div>
+<div class="bg-surface-container border border-outline-variant rounded-xl p-4">
+<h4 class="text-label-caps font-bold text-secondary mb-2 uppercase tracking-widest">Risk Profile</h4>
+<div class="flex gap-2 mt-1">
+<div class="flex flex-col items-center gap-1">
+<div class="w-2 h-2 rounded-full bg-error"></div>
+<span class="text-[8px] text-on-surface-variant uppercase">Sec</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="text-[8px] text-on-surface-variant uppercase">Perf</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-[8px] text-on-surface-variant uppercase">Maint</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container border border-outline-variant rounded-xl p-4">
+<h4 class="text-label-caps font-bold text-secondary mb-2 uppercase tracking-widest">Business Impact</h4>
+<p class="text-on-surface-variant text-body-md leading-relaxed">
+    This file manages authentication and directly affects application security and user trust.
+  </p>
+</div>
+<!-- AI Generated Explanation -->
+<div class="bg-surface-container border border-outline-variant rounded-xl p-stack-md relative overflow-hidden">
+<!-- Atmospheric effect -->
+<div class="absolute top-0 right-0 p-4 opacity-20">
+<span class="material-symbols-outlined text-6xl text-primary rotate-12">auto_awesome</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">smart_toy</span> AI Explanation
+                        </h3>
+<div class="space-y-6">
+<div>
+<h4 class="text-label-caps font-bold text-secondary mb-2 uppercase tracking-widest">Purpose</h4>
+<p class="text-on-surface-variant leading-relaxed">
+                                    The <span class="text-primary font-bold">AuthController.js</span> serves as the primary entry point for all identity-related operations. It acts as an orchestrator between the HTTP request layer and the underlying <span class="font-code-md text-tertiary">authService</span>, ensuring validated credentials before session issuance.
+                                </p>
+</div>
+<div>
+<h4 class="text-label-caps font-bold text-secondary mb-2 uppercase tracking-widest">Key Functions</h4>
+<ul class="space-y-2">
+<li class="flex items-start gap-3">
+<span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>
+<span class="text-on-surface"><span class="font-code-md text-primary">handleLogin</span>: Validates body schema and initiates JWT generation.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>
+<span class="text-on-surface"><span class="font-code-md text-primary">handleLogout</span>: Invalidates current token in Redis and clears browser state.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>
+<span class="text-on-surface"><span class="font-code-md text-primary">refreshSession</span>: Issues a new access token using a valid refresh rotate key.</span>
+</li>
+</ul>
+</div>
+<div>
+<h4 class="text-label-caps font-bold text-secondary mb-2 uppercase tracking-widest">Dependencies</h4>
+<div class="flex flex-wrap gap-2">
+<span class="bg-surface-container-highest border border-outline-variant px-2 py-1 rounded text-[11px] font-code-md">authService.js</span>
+<span class="bg-surface-container-highest border border-outline-variant px-2 py-1 rounded text-[11px] font-code-md">Logger.js</span>
+<span class="bg-surface-container-highest border border-outline-variant px-2 py-1 rounded text-[11px] font-code-md">schema/auth.json</span>
+</div>
+</div>
+<div>
+<h4 class="text-label-caps font-bold text-secondary mb-2 uppercase tracking-widest">Suggested Reading Order</h4>
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2 text-code-sm font-code-md text-on-surface-variant">
+<span class="text-primary">1.</span> middleware/auth.js
+      <span class="material-symbols-outlined text-[12px]">arrow_forward</span>
+</div>
+<div class="flex items-center gap-2 text-code-sm font-code-md text-on-surface-variant">
+<span class="text-primary">2.</span> controller/authController.js
+      <span class="material-symbols-outlined text-[12px]">arrow_forward</span>
+</div>
+<div class="flex items-center gap-2 text-code-sm font-code-md text-on-surface-variant">
+<span class="text-primary">3.</span> service/authService.js
+    </div>
+</div>
+</div></div>
+</div>
+<!-- Architecture Visualization -->
+<div class="bg-surface-container border border-outline-variant rounded-xl p-stack-md h-[340px] flex flex-col">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">schema</span> Architecture Visualization
+                        </h3>
+<div class="flex-1 relative bg-surface-container-lowest rounded-lg border border-outline-variant/30 flex items-center justify-center p-4">
+<svg class="w-full h-full" viewbox="0 0 400 240">
+<!-- Nodes -->
+<rect fill="#1e1f26" height="40" rx="4" stroke="#adc6ff" stroke-width="1.5" width="100" x="150" y="20"></rect>
+<text fill="#adc6ff" font-family="JetBrains Mono" font-size="12" text-anchor="middle" x="200" y="45">API Routes</text>
+<rect fill="#161B22" height="40" rx="4" stroke="#4edea3" stroke-width="2" width="100" x="150" y="100"></rect>
+<text fill="#4edea3" font-family="JetBrains Mono" font-size="12" font-weight="bold" text-anchor="middle" x="200" y="125">AuthController</text>
+<rect fill="#1e1f26" height="40" rx="4" stroke="#424754" stroke-width="1" width="80" x="40" y="180"></rect>
+<text fill="#e2e2eb" font-family="JetBrains Mono" font-size="10" text-anchor="middle" x="80" y="205">authService</text>
+<rect fill="#1e1f26" height="40" rx="4" stroke="#424754" stroke-width="1" width="80" x="160" y="180"></rect>
+<text fill="#e2e2eb" font-family="JetBrains Mono" font-size="10" text-anchor="middle" x="200" y="205">Logger</text>
+<rect fill="#1e1f26" height="40" rx="4" stroke="#424754" stroke-width="1" width="80" x="280" y="180"></rect>
+<text fill="#e2e2eb" font-family="JetBrains Mono" font-size="10" text-anchor="middle" x="320" y="205">RedisStore</text>
+<!-- Edges (Dependency Lines) -->
+<path class="dependency-line" d="M200 60 L200 100" fill="none" stroke-width="1.5"></path>
+<path class="dependency-line" d="M150 120 L80 180" fill="none" stroke-width="1.5"></path>
+<path class="dependency-line" d="M200 140 L200 180" fill="none" stroke-width="1.5"></path>
+<path class="dependency-line" d="M250 120 L320 180" fill="none" stroke-width="1.5"></path>
+<!-- Arrows -->
+<polygon fill="#adc6ff" points="200,100 196,94 204,94"></polygon>
+<polygon fill="#424754" points="80,180 84,174 76,174"></polygon>
+<polygon fill="#424754" points="200,180 204,174 196,174"></polygon>
+<polygon fill="#424754" points="320,180 316,174 324,174"></polygon>
+</svg>
+<div class="absolute bottom-3 left-3 flex items-center gap-2 text-[10px] text-on-surface-variant font-code-md">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> Active Module
+                                <span class="w-2 h-2 rounded-full bg-primary ml-2"></span> Parent Entry
+                            </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Meta Info -->
+<footer class="mt-stack-lg border-t border-outline-variant pt-6 flex flex-col md:flex-row justify-between items-center opacity-60 text-body-md">
+<div class="flex items-center gap-4 mb-4 md:mb-0">
+<span class="material-symbols-outlined text-sm">terminal</span>
+<span>Analyzed with Titan-4 Neural Engine</span>
+</div>
+<div class="flex gap-6">
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-primary transition-colors" href="#">API Status</a>
+</div>
+</footer>
+</div>
+</main>
+<!-- FAB for quick action -->
+<button class="fixed bottom-8 right-88 bg-primary text-on-primary w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all z-50 mr-80">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<script>
+        // Micro-interactions for the tree-view or code highlighing
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableRows = document.querySelectorAll('tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', () => {
+                    row.style.boxShadow = 'inset 4px 0 0 0 #adc6ff';
+                });
+                row.addEventListener('mouseleave', () => {
+                    row.style.boxShadow = 'none';
+                });
+            });
+
+            // Handle focus state for the chat
+            const chatArea = document.querySelector('textarea');
+            chatArea.addEventListener('focus', () => {
+                chatArea.parentElement.classList.add('ring-2', 'ring-secondary/50');
+            });
+            chatArea.addEventListener('blur', () => {
+                chatArea.parentElement.classList.remove('ring-2', 'ring-secondary/50');
+            });
+        });
+    </script>
+</body></html>
