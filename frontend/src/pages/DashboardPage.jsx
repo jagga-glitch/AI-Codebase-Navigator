@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import NavbarLayout from '../components/NavbarLayout.jsx';
 import { useRepos, useRepoActions } from '../hooks/useRepos.js';
 import toast from 'react-hot-toast';
-
+import { getStrokeDashOffset } from '../utils/chartUtils';
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { repos, isLoading, error } = useRepos();

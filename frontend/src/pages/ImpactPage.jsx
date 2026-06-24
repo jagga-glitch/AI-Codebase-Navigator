@@ -4,7 +4,7 @@ import NavbarLayout from '../components/NavbarLayout.jsx';
 import { useRepoDetails } from '../hooks/useRepos.js';
 import { useRepoImpact } from '../hooks/useRepoAnalysis.js';
 import toast from 'react-hot-toast';
-
+import { getStrokeDashOffset } from '../utils/chartUtils';
 export default function ImpactPage() {
   const { repoId } = useParams();
   const navigate = useNavigate();
