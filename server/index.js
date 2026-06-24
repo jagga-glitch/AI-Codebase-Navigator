@@ -28,6 +28,8 @@ try {
 
 // Routers
 import authRouter from './routes/auth.js';
+
+console.log('AUTH ROUTER IMPORTED:', authRouter);
 import reposRouter from './routes/repos.js';
 import chatRouter from './routes/chat.js';
 
