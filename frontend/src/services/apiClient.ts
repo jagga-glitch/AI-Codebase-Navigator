@@ -66,12 +66,15 @@ apiClient.interceptors.response.use(
       localStorage.removeItem('token');
     }
 
+    const requestUrl = error?.config
+      ? `${error.config.baseURL || ''}${error.config.url || ''}`
+      : 'unknown';
+
     const apiError: ApiError = {
       message:
         error?.response?.data?.message ||
         error?.response?.data?.error ||
-        error?.message ||
-        'Request failed',
+        `${error?.message || 'Request failed'} (URL: ${requestUrl})`,
       status: error?.response?.status,
       data: error?.response?.data,
     };

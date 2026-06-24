@@ -105,11 +105,7 @@ export default function DashboardPage() {
     return { complexFiles, riskyFiles, loopsCount, archScore, techDebt };
   }, [selectedRepo]);
 
-  // Helper to calculate health gauge offset
-  const getStrokeDashOffset = (score, radius = 58) => {
-    const circumference = 2 * Math.PI * radius;
-    return circumference - (score / 100) * circumference;
-  };
+
 
   return (
     <NavbarLayout>
