@@ -7,14 +7,33 @@ export interface ApiError {
 }
 
 const getBaseURL = (): string => {
+  let baseUrl = '';
+  
   if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL.toString();
+    baseUrl = import.meta.env.VITE_API_BASE_URL.toString();
+  } else {
+    const defaultPort = '5055'; // Fallback backend port matching server/.env
+    if (typeof window !== 'undefined') {
+      baseUrl = `${window.location.protocol}//${window.location.hostname}:${defaultPort}`;
+    } else {
+      baseUrl = `http://localhost:${defaultPort}`;
+    }
   }
-  const defaultPort = '5055'; // Fallback backend port matching server/.env
-  if (typeof window !== 'undefined') {
-    return `${window.location.protocol}//${window.location.hostname}:${defaultPort}/api`;
+
+  // Ensure the baseUrl does not end with '/api' or '/api/' because all apiClient requests 
+  // explicitly start with '/api' (e.g. '/api/auth/login').
+  if (baseUrl.endsWith('/api')) {
+    baseUrl = baseUrl.slice(0, -4);
+  } else if (baseUrl.endsWith('/api/')) {
+    baseUrl = baseUrl.slice(0, -5);
   }
-  return `http://localhost:${defaultPort}/api`;
+
+  // Strip trailing slash if present to maintain consistency
+  if (baseUrl.endsWith('/')) {
+    baseUrl = baseUrl.slice(0, -1);
+  }
+
+  return baseUrl;
 };
 
 export const apiClient = axios.create({

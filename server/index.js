@@ -22,6 +22,7 @@ import reposRouter from './routes/repos.js';
 import chatRouter from './routes/chat.js';
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 5000;
 
 // Request Logger (only in non-production)
@@ -32,13 +33,29 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // CORS setup
-const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:5173', 'http://localhost:5000', 'http://127.0.0.1:5000', 'http://localhost:5055', 'http://127.0.0.1:5055',"http://localhost:5174","http://localhost:5175"].filter(Boolean);
+const allowedOrigins = [
+  process.env.CLIENT_URL, 
+  'http://localhost:5173', 
+  'http://localhost:5000', 
+  'http://127.0.0.1:5000', 
+  'http://localhost:5055', 
+  'http://127.0.0.1:5055',
+  'http://localhost:5174',
+  'http://localhost:5175'
+]
+  .filter(Boolean)
+  .map(url => url.replace(/\/$/, '')); // Strip trailing slash to prevent CORS mismatch
+
 app.use(cors({
   origin: (origin, callback) => {
+    // Strip trailing slash from request origin if present for comparison
+    const sanitizedOrigin = origin ? origin.replace(/\/$/, '') : null;
+    
     // Allow requests with no origin (like mobile apps or curl/postman)
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!sanitizedOrigin || allowedOrigins.includes(sanitizedOrigin)) {
       callback(null, true);
     } else {
+      console.warn(`CORS blocked request from origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -61,14 +78,11 @@ const globalLimiter = rateLimit({
 });
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    success: false,
-    message: 'Too many login/registration attempts from this IP, please try again after 15 minutes'
-  }
+  trustProxy: true,
 });
 
 // Apply rate limiters
