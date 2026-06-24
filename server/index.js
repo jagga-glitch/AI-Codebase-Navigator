@@ -32,7 +32,7 @@ import authRouter from './routes/auth.js';
 console.log('AUTH ROUTER IMPORTED:', authRouter);
 import reposRouter from './routes/repos.js';
 import chatRouter from './routes/chat.js';
-
+console.log("SERVER VERSION: 24-JUNE-AUTH-DEBUG");
 const app = express();
 app.set('trust proxy', 1);
 const PORT = process.env.PORT || 5000;
