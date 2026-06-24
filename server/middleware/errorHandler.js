@@ -15,7 +15,7 @@ const errorHandler = (err, req, res, next) => {
   error.stack = err.stack;
 
   // Log error stack only in development mode
-  if (process.env.NODE_ENV === 'development') {
+  if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
     console.error(err.stack);
   }
 
