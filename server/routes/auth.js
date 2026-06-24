@@ -10,4 +10,10 @@ router.get('/me', protect, authController.getMe);
 
 console.log('AUTH ROUTES LOADED');
 
+router.get('/ping', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Auth router working'
+  });
+});
 export default router;
