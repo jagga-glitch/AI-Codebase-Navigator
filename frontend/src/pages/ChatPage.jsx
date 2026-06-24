@@ -191,7 +191,14 @@ export default function ChatPage() {
 
                     {isUser && (
                       <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex-shrink-0 flex items-center justify-center text-white font-bold text-xs shadow-[0_0_8px_rgba(99,102,241,0.2)]">
-                        {user?.name && user.name[0] ? user.name[0].toUpperCase() : 'U'}
+                        useEffect(() => {
+                          first
+                        
+                          return () => {
+                            second
+                          }
+                        }, [third])
+                        
                       </div>
                     )}
                   </div>

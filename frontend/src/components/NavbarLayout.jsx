@@ -280,11 +280,11 @@ export default function NavbarLayout({ children }) {
             <div className="flex items-center gap-3 bg-slate-950/40 p-2 rounded-xl border border-white/5">
               {/* Profile Avatar Gradient */}
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-sm shadow-[0_0_10px_rgba(99,102,241,0.3)]">
-                {user.name ? user.name[0].toUpperCase() : 'U'}
+                {user?.name?.[0]?.toUpperCase() || 'U'}
               </div>
               <div className="flex flex-col flex-1 truncate leading-tight">
-                <span className="text-[11px] font-bold text-white truncate">{user.name}</span>
-                <span className="text-[9px] text-slate-500 truncate">{user.email}</span>
+                <span className="text-[11px] font-bold text-white truncate">{user?.name || 'Guest User'}</span>
+                <span className="text-[9px] text-slate-500 truncate">{user?.email || 'guest@example.com'}</span>
               </div>
               <button 
                 onClick={handleLogout} 
