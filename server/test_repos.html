@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Repo Management API Test Suite</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0f172a;
+      color: #cbd5e1;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #f8fafc;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 10px;
+    }
+    .test-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    .test-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+    }
+    .test-name {
+      color: #38bdf8;
+    }
+    .test-status {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    .status-success {
+      background: #064e3b;
+      color: #34d399;
+    }
+    .status-fail {
+      background: #7f1d1d;
+      color: #f87171;
+    }
+    pre {
+      background: #0f172a;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+      border: 1px solid #1e293b;
+      color: #e2e8f0;
+      font-family: Consolas, Monaco, monospace;
+      margin: 10px 0 0 0;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+  <h1>Repo Management API Test Dashboard</h1>
+  <button id="run-btn" onclick="runTests()">Run Repo Tests</button>
+  <div id="results" style="margin-top: 20px;"></div>
+
+  <script>
+    async function runTests() {
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = 'Running tests...';
+      
+      const tests = [];
+      const email = `repo_test_${Date.now()}@example.com`;
+      const password = 'securepassword123';
+      const name = 'Repo Tester';
+      let token = null;
+      let repoId = null;
+
+      // Helper function to push test results
+      function recordTest(num, name, expected, res, data, passed) {
+        tests.push({
+          num,
+          name,
+          expected,
+          actualStatus: res ? res.status : 'N/A',
+          actualData: data,
+          passed
+        });
+      }
+
+      // Step 1: Register User to get Auth Token
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+        const data = await res.json();
+        token = data.token;
+        recordTest(1, 'Register test user', '201 with token', res, data, res.status === 201 && !!token);
+      } catch (err) {
+        recordTest(1, 'Register test user', '201 with token', null, err.message, false);
+        resultsDiv.innerHTML = 'Failed to register test user. Tests aborted.';
+        return;
+      }
+
+      const authHeaders = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+
+      // Step 2: Create Repository (POST /api/repos)
+      try {
+        const res = await fetch('/api/repos', {
+          method: 'POST',
+          headers: authHeaders,
+          body: JSON.stringify({ githubUrl: 'https://github.com/expressjs/express' })
+        });
+        const data = await res.json();
+        repoId = data._id;
+        recordTest(2, 'Create Repository (POST /api/repos)', '201 with repo data', res, data, res.status === 201 && !!repoId);
+      } catch (err) {
+        recordTest(2, 'Create Repository (POST /api/repos)', '201 with repo data', null, err.message, false);
+      }
+
+      // Step 3: Wait for analysis & verify Repository by ID (GET /api/repos/:id)
+      if (repoId) {
+        try {
+          // Wait 3 seconds for simulated background analysis to finish
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          const res = await fetch(`/api/repos/${repoId}`, {
+            method: 'GET',
+            headers: authHeaders
+          });
+          const data = await res.json();
+          recordTest(3, 'Get Repository by ID (GET /api/repos/:id)', "200 with status: 'done'", res, data, res.status === 200 && data.status === 'done');
+        } catch (err) {
+          recordTest(3, 'Get Repository by ID (GET /api/repos/:id)', "200 with status: 'done'", null, err.message, false);
+        }
+      }
+
+      // Step 4: Get Graph (GET /api/repos/:id/graph)
+      if (repoId) {
+        try {
+          const res = await fetch(`/api/repos/${repoId}/graph`, {
+            method: 'GET',
+            headers: authHeaders
+          });
+          const data = await res.json();
+          recordTest(4, 'Get Graph (GET /api/repos/:id/graph)', '200 with graph nodes/edges', res, data, res.status === 200 && Array.isArray(data.nodes) && Array.isArray(data.edges));
+        } catch (err) {
+          recordTest(4, 'Get Graph (GET /api/repos/:id/graph)', '200 with graph nodes/edges', null, err.message, false);
+        }
+      }
+
+      // Step 5: Analyze Impact (POST /api/repos/:id/impact)
+      if (repoId) {
+        try {
+          const res = await fetch(`/api/repos/${repoId}/impact`, {
+            method: 'POST',
+            headers: authHeaders,
+            body: JSON.stringify({ feature: 'Implement rate limiting' })
+          });
+          const data = await res.json();
+          recordTest(5, 'Analyze Impact (POST /api/repos/:id/impact)', '200 with impact results', res, data, res.status === 200 && !!data.impact);
+        } catch (err) {
+          recordTest(5, 'Analyze Impact (POST /api/repos/:id/impact)', '200 with impact results', null, err.message, false);
+        }
+      }
+
+      // Step 6: Get Knowledge Gap (GET /api/repos/:id/knowledge-gap)
+      if (repoId) {
+        try {
+          const res = await fetch(`/api/repos/${repoId}/knowledge-gap`, {
+            method: 'GET',
+            headers: authHeaders
+          });
+          const data = await res.json();
+          recordTest(6, 'Get Knowledge Gap (GET /api/repos/:id/knowledge-gap)', '200 with knowledge gap report', res, data, res.status === 200 && !!data.knowledgeGap);
+        } catch (err) {
+          recordTest(6, 'Get Knowledge Gap (GET /api/repos/:id/knowledge-gap)', '200 with knowledge gap report', null, err.message, false);
+        }
+      }
+
+      // Step 7: Delete Repository (DELETE /api/repos/:id)
+      if (repoId) {
+        try {
+          const res = await fetch(`/api/repos/${repoId}`, {
+            method: 'DELETE',
+            headers: authHeaders
+          });
+          const data = await res.json();
+          recordTest(7, 'Delete Repository (DELETE /api/repos/:id)', '200 with success message', res, data, res.status === 200 && data.success === true);
+        } catch (err) {
+          recordTest(7, 'Delete Repository (DELETE /api/repos/:id)', '200 with success message', null, err.message, false);
+        }
+      }
+
+      // Step 8: Verify Deletion (GET /api/repos)
+      try {
+        const res = await fetch('/api/repos', {
+          method: 'GET',
+          headers: authHeaders
+        });
+        const data = await res.json();
+        // The list should not contain the deleted repository
+        const containsDeleted = data.repos && data.repos.some(r => r._id === repoId);
+        recordTest(8, 'Verify Deletion (GET /api/repos)', '200 with list not containing deleted repo', res, data, res.status === 200 && !containsDeleted);
+      } catch (err) {
+        recordTest(8, 'Verify Deletion (GET /api/repos)', '200 with list not containing deleted repo', null, err.message, false);
+      }
+
+      // Render results
+      resultsDiv.innerHTML = '';
+      tests.forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'test-card';
+        card.innerHTML = `
+          <div class="test-header">
+            <span class="test-name">Test ${t.num}: ${t.name}</span>
+            <span class="test-status ${t.passed ? 'status-success' : 'status-fail'}">
+              ${t.passed ? 'PASSED' : 'FAILED'}
+            </span>
+          </div>
+          <p><strong>Expected:</strong> ${t.expected}</p>
+          <p><strong>Actual Status:</strong> ${t.actualStatus || 'N/A'}</p>
+          <pre>${JSON.stringify(t.actualData || {}, null, 2)}</pre>
+        `;
+        resultsDiv.appendChild(card);
+      });
+      
+      window.testResults = tests;
+    }
+  </script>
+</body>
+</html>
