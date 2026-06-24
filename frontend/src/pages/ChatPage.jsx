@@ -3,6 +3,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import NavbarLayout from '../components/NavbarLayout.jsx';
 import { useChat, useChatActions } from '../hooks/useChat.js';
 import { useRepoDetails } from '../hooks/useRepos.js';
+import { useAuthContext } from '../context/AuthContext.jsx';
 import toast from 'react-hot-toast';
 
 export default function ChatPage() {
@@ -11,6 +12,7 @@ export default function ChatPage() {
   const [searchParams] = useSearchParams();
   const urlQuestion = searchParams.get('question') || '';
 
+  const { user } = useAuthContext();
   const { data: repo } = useRepoDetails(repoId);
   const { data: chatData, isLoading: isChatLoading } = useChat(repoId);
   const { sendMutation, deleteMutation } = useChatActions(repoId);
@@ -189,7 +191,7 @@ export default function ChatPage() {
 
                     {isUser && (
                       <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex-shrink-0 flex items-center justify-center text-white font-bold text-xs shadow-[0_0_8px_rgba(99,102,241,0.2)]">
-                        {user?.name ? user.name[0].toUpperCase() : 'U'}
+                        {user?.name && user.name[0] ? user.name[0].toUpperCase() : 'U'}
                       </div>
                     )}
                   </div>
